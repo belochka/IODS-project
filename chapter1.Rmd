@@ -1,7 +1,15 @@
 
 # About the project
 
-*Write a short description about the course and add a link to your GitHub repository here. This is an R Markdown (.Rmd) file so you should use R Markdown syntax.*
+<!-- *Write a short description about the course and add a link to your GitHub repository here. This is an R Markdown (.Rmd) file so you should use R Markdown syntax.* -->
+
+Hi, I'm Bella.
+
+I'm on this course mostly for the 'Data Science' (statistics) part of it, as I already know how to use Git (if something I don't know — Google will help) and used R from time to time.  
+  
+GitHub repo: https://github.com/belochka/IODS-project
+
+Diary: https://belochka.github.io/IODS-project/
 
 ```{r}
 # This is a so-called "R chunk" where you can write R code.
@@ -9,5 +17,5 @@
 date()
 
 ```
-The text continues here.
+<!-- The text continues here. -->
 
