@@ -1,13 +1,48 @@
-# Insert chapter 2 title here
+# 2. Regression and model validation
 
-*Describe the work you have done this week and summarize your learning.*
+<!-- *Describe the work you have done this week and summarize your learning.* -->
 
-- Describe your work and results clearly. 
-- Assume the reader has an introductory course level understanding of writing and reading R code as well as statistical methods.
-- Assume the reader has no previous knowledge of your data or the more advanced methods you are using.
+<!-- - Describe your work and results clearly.  -->
+<!-- - Assume the reader has an introductory course level understanding of writing and reading R code as well as statistical methods. -->
+<!-- - Assume the reader has no previous knowledge of your data or the more advanced methods you are using. -->
+
+Let's learn a bit about regression and model validation in this chapter. I am here to learn that as well, so, please, don't consider it as a source of real knowledge.
+
+Usually, it's easier to understand a new topic on an example, therefore --- here is one:
 
 ```{r}
-date()
+students2014 <- read.table(file = 'data/learning2014.txt', sep=",")
 ```
 
-Here we go again...
+This will read the data that was previously prepared such that we now can investigate it. 
+
+First, what is the data there?
+
+```{r}
+dim(students2014)
+```
+
+This means that there are 166 lines and 7 columns. Ok, what's the actual data afterall?
+
+```{r}
+str(students2014)
+```
+
+As far as I understand that is the answers to the questionnaire of students who took the "Introduction to social statistics course" (the original name in Finnish, but I still don't know Finnish, so I'll use the translation provided) in the autumn of 2014. `gender` and `age` are clearly understandable. `attitude` --- some cumulative information about the attitude to learning of statistics, `deep` --- how serious is the student about the learning process, they call it "deep approach", `stra` --- strategic approach (if a student have a plan for the week and studies, being able to make good use of the time, and so on), `surf` --- surface approach (quite the opposite, something like: "I concentrate to learning just those bits of information I have to know to pass."), `points` --- exam points.
+
+`attitude`, `deep`, `stra`, and `surf` can have values in the interval [1, 5], where, I suppose, `1` means "strongly disagree", and '5' means "strongly agree". 
+I'm not sure what was the maximum available result during the exam, but if to run
+
+```{r}
+summary(students2014)
+```
+
+one can see, that in this dataset `points` have integer values in [7, 33].
+
+As `summary()` doesn't output a bit more interesting information about the `gender` column itself, let's try
+
+```{r}
+table(students2014$gender)
+```
+There were 110 female students and 56 male students that finished the course.
+

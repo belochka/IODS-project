@@ -450,7 +450,7 @@ summary {
 <ul>
 <li><a href="#introduction-to-open-data-science---course-project">Introduction to Open Data Science - Course Project</a></li>
 <li><a href="#about-the-project">About the project</a></li>
-<li><a href="#insert-chapter-2-title-here">Insert chapter 2 title here</a></li>
+<li><a href="#regression-and-model-validation">2. Regression and model validation</a></li>
 </ul>
 </div>
 
@@ -468,21 +468,57 @@ summary {
 <pre class="r"><code># This is a so-called &quot;R chunk&quot; where you can write R code.
 
 date()</code></pre>
-<pre><code>## [1] &quot;Mon Oct 26 17:46:00 2020&quot;</code></pre>
+<pre><code>## [1] &quot;Wed Nov  4 01:19:47 2020&quot;</code></pre>
 <!-- The text continues here. -->
 <hr />
 </div>
-<div id="insert-chapter-2-title-here" class="section level1">
-<h1>Insert chapter 2 title here</h1>
-<p><em>Describe the work you have done this week and summarize your learning.</em></p>
-<ul>
-<li>Describe your work and results clearly.</li>
-<li>Assume the reader has an introductory course level understanding of writing and reading R code as well as statistical methods.</li>
-<li>Assume the reader has no previous knowledge of your data or the more advanced methods you are using.</li>
-</ul>
-<pre class="r"><code>date()</code></pre>
-<pre><code>## [1] &quot;Mon Oct 26 17:46:00 2020&quot;</code></pre>
-<p>Here we go again…</p>
+<div id="regression-and-model-validation" class="section level1">
+<h1>2. Regression and model validation</h1>
+<!-- *Describe the work you have done this week and summarize your learning.* -->
+<!-- - Describe your work and results clearly.  -->
+<!-- - Assume the reader has an introductory course level understanding of writing and reading R code as well as statistical methods. -->
+<!-- - Assume the reader has no previous knowledge of your data or the more advanced methods you are using. -->
+<p>Let’s learn a bit about regression and model validation in this chapter. I am here to learn that as well, so, please, don’t consider it as a source of real knowledge.</p>
+<p>Usually, it’s easier to understand a new topic on an example, therefore — here is one:</p>
+<pre class="r"><code>students2014 &lt;- read.table(file = &#39;data/learning2014.txt&#39;, sep=&quot;,&quot;)</code></pre>
+<p>This will read the data that was previously prepared such that we now can investigate it.</p>
+<p>First, what is the data there?</p>
+<pre class="r"><code>dim(students2014)</code></pre>
+<pre><code>## [1] 166   7</code></pre>
+<p>This means that there are 166 lines and 7 columns. Ok, what’s the actual data afterall?</p>
+<pre class="r"><code>str(students2014)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    166 obs. of  7 variables:
+##  $ gender  : chr  &quot;F&quot; &quot;M&quot; &quot;F&quot; &quot;M&quot; ...
+##  $ age     : int  53 55 49 53 49 38 50 37 37 42 ...
+##  $ attitude: num  3.7 3.1 2.5 3.5 3.7 3.8 3.5 2.9 3.8 2.1 ...
+##  $ deep    : num  3.58 2.92 3.5 3.5 3.67 ...
+##  $ stra    : num  3.38 2.75 3.62 3.12 3.62 ...
+##  $ surf    : num  2.58 3.17 2.25 2.25 2.83 ...
+##  $ points  : int  25 12 24 10 22 21 21 31 24 26 ...</code></pre>
+<p>As far as I understand that is the answers to the questionnaire of students who took the “Introduction to social statistics course” (the original name in Finnish, but I still don’t know Finnish, so I’ll use the translation provided) in the autumn of 2014. <code>gender</code> and <code>age</code> are clearly understandable. <code>attitude</code> — some cumulative information about the attitude to learning of statistics, <code>deep</code> — how serious is the student about the learning process, they call it “deep approach”, <code>stra</code> — strategic approach (if a student have a plan for the week and studies, being able to make good use of the time, and so on), <code>surf</code> — surface approach (quite the opposite, something like: “I concentrate to learning just those bits of information I have to know to pass.”), <code>points</code> — exam points.</p>
+<p><code>attitude</code>, <code>deep</code>, <code>stra</code>, and <code>surf</code> can have values in the interval [1, 5], where, I suppose, <code>1</code> means “strongly disagree”, and ‘5’ means “strongly agree”. I’m not sure what was the maximum available result during the exam, but if to run</p>
+<pre class="r"><code>summary(students2014)</code></pre>
+<pre><code>##     gender               age           attitude          deep      
+##  Length:166         Min.   :17.00   Min.   :1.400   Min.   :1.583  
+##  Class :character   1st Qu.:21.00   1st Qu.:2.600   1st Qu.:3.333  
+##  Mode  :character   Median :22.00   Median :3.200   Median :3.667  
+##                     Mean   :25.51   Mean   :3.143   Mean   :3.680  
+##                     3rd Qu.:27.00   3rd Qu.:3.700   3rd Qu.:4.083  
+##                     Max.   :55.00   Max.   :5.000   Max.   :4.917  
+##       stra            surf           points     
+##  Min.   :1.250   Min.   :1.583   Min.   : 7.00  
+##  1st Qu.:2.625   1st Qu.:2.417   1st Qu.:19.00  
+##  Median :3.188   Median :2.833   Median :23.00  
+##  Mean   :3.121   Mean   :2.787   Mean   :22.72  
+##  3rd Qu.:3.625   3rd Qu.:3.167   3rd Qu.:27.75  
+##  Max.   :5.000   Max.   :4.333   Max.   :33.00</code></pre>
+<p>one can see, that in this dataset <code>points</code> have integer values in [7, 33].</p>
+<p>As <code>summary()</code> doesn’t output a bit more interesting information about the <code>gender</code> column itself, let’s try</p>
+<pre class="r"><code>table(students2014$gender)</code></pre>
+<pre><code>## 
+##   F   M 
+## 110  56</code></pre>
+<p>There were 110 female students and 56 male students that finished the course.</p>
 <hr />
 <p>(more chapters to be added similarly as we proceed with the course!)</p>
 </div>
