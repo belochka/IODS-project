@@ -48,12 +48,78 @@ There were 110 female students and 56 male students that finished the course.
 
 Trying to grasp the data as a whole, let's plot it:
 
-```{r}
+```{r echo=FALSE, message=FALSE}
 library(GGally)
 library(ggplot2)
-p <- ggpairs(students2014, mapping = aes(col = gender, alpha = 0.3), lower = list(combo = wrap("facethist", bins = 20)))
+p <- ggpairs(students2014, mapping = aes(col = gender, alpha = 0.3), lower = list(combo = wrap("facethist", bins = 20)), upper = list(continuous = wrap("cor", size = 2))) 
 p
 ```
+
+
 We know that there were more female students than male, therefore the pinkish  is for females, and blueish --- males.
 First column of horizontal histograms show how many females/males are of a certain age, have a certain attitute, and so forth.
-First row --- boxplots --- median, quartiles (median of lower and apper parts of the dataset), maximum, minimum and outliers. It shows that median global attitude toward statistics among females is lower than among males, males in general are less strategic then females in ther approach for studies, 
+First row --- boxplots --- median, quartiles (median of lower and apper parts of the dataset), maximum, minimum and outliers. It shows that median global attitude toward statistics among females is lower than among males, males in general are less strategic then females in their approach for studies.
+
+Statistics and distributions were in my life quite some time ago, so the rest might sound like a completely wrong thing to a more experienced (or with a deeper approach) person:
+
+* `age` has either gamma or log-normal distribution
+* `deep` --- beta distribution
+* `stra` looks like normal to me, ecpecially for males
+* the rest --- I don't know.
+
+The other thing to pay attention to is the symbol that explains the significance of the correlation (p-value):
+
+`
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+`
+
+So one need to look closer to those pairs of columns that correspond to `***`. These are couples `surf -- deep` and `points -- attitude`.
+
+What do points depend on (if on anything) in this dataset? To answer that question *multiple regression* can help. When there are more than one explanatory variables in the linear model, it is called multiple regression. Or some excerpt from [Wikipedia](https://en.wikipedia.org/wiki/Regression_analysis):
+
+```
+In statistical modeling, *regression analysis* is a set of statistical processes for estimating the relationships between a dependent variable and one or more independent variables. The most common form of regression analysis is *linear regression*, in which a researcher finds the line (or a more complex linear combination) that most closely fits the data according to a specific mathematical criterion.
+
+Regression analysis is primarily used for two conceptually distinct purposes. First, regression analysis is widely used for *prediction* and *forecasting*, where its use has substantial overlap with the field of machine learning. Second, in some situations regression analysis can be used to *infer causal relationships* between the independent and dependent variables. Importantly, regressions by themselves only reveal relationships between a dependent variable and a collection of independent variables in a fixed dataset. To use regressions for prediction or to infer causal relationships, respectively, a researcher must carefully justify why existing relationships have predictive power for a new context or why a relationship between two variables has a causal interpretation.
+```
+
+Let's choose the parameters with the biggest correlation regarding to `points`: `attitude`, `stra`, and `surf`.
+
+```{r}
+summary(lm(points ~ attitude + stra + surf, data = students2014))
+```
+
+
+This summary shows that p-value < 0.05 only for attitude, what means that there is no statistically proved dependency between strategic approach and the point for the exam, or between surface approach and points. Therefore if to remove `stra` and `surf`:
+
+```{r}
+summary(lm(points ~ attitude, data = students2014))
+```
+
+the dependecy becomes even stronger (because p-value became smaller).
+
+*Residuals* are essentially the difference between the actual observed response values (distance to stop dist in our case) and the response values that the model predicted. When assessing how well the model fit the data, you should look for a symmetrical distribution across these points on the mean value zero (0). If the distribution of the residuals do not appear to be strongly symmetrical that means that the model predicts certain points that fall far away from the actual observed points. 
+
+*Coefficients* in simple linear regression, the coefficients are two unknown constants that represent the *intercept* and *slope* terms in the linear model.
+The intercept (the first row), in our example --- is essentially the expected value of the points for the exam when we consider the average attitude of all students in the dataset. The second row in the Coefficients is the slope, or in our example, the effect attitude had in the exam results. The slope term in our model is saying that for every 1 point higher attitude (instead of, say, 2, it will be 3), the exam goes up 3,53 points.
+
+The coefficient *t-value* is a measure of how many standard deviations our coefficient estimate is far away from 0. We want it to be far away from zero as this would indicate we could reject the null hypothesis --- that is, we could declare a relationship between attitude and points exists. In our example, the t-statistic values are relatively far away from zero and are large relative to the standard error, which could indicate a relationship exists. In general, t-values are also used to compute p-values.
+
+The *Pr(>t)* acronym found in the model output relates to the probability of observing any value equal or larger than t. A small p-value indicates that it is unlikely we will observe a relationship between the predictor (`attitude`) and response (`points`) variables due to chance. Typically, a p-value of 5% or less is a good cut-off point. In our model example, the p-values are very close to zero. Note the ‘signif. Codes’ associated to each estimate. Three stars (or asterisks) represent a highly significant p-value. Consequently, a small p-value for the intercept and the slope indicates that we can reject the null hypothesis, which allows us to conclude that there is a relationship between attitude and points.
+
+*Residual Standard Error* is measure of the quality of a linear regression fit. Theoretically, every linear model is assumed to contain an error term. It is the average amount that the response (`points`) will deviate from the true regression line. In our example, the actual exam result can deviate from the true regression line by approximately 5.32 points, on average. In other words, given that the mean points for the exam is 11.64 and that the Residual Standard Error is 5.32, we can say that the percentage error is (any prediction would still be off by) 45.70%. It’s also worth noting that the Residual Standard Error was calculated with 164 degrees of freedom. Simplistically, degrees of freedom are the number of data points that went into the estimation of the parameters used after taking into account these parameters (restriction). In our case, we had 166 data points and two parameters (intercept and slope).
+
+The *R-squared* (R^2^) statistic provides a measure of how well the model is fitting the actual data. It takes the form of a proportion of variance. R^2^ is a measure of the linear relationship between our predictor variable (`attitude`) and our response / target variable (`points`). It always lies between 0 and 1 (i.e.: a number near 0 represents a regression that does not explain the variance in the response variable well and a number close to 1 does explain the observed variance in the response variable). In our example, the R^2^ we get is 0.1906. Or roughly 19% of the variance found in the response variable (`points`) can be explained by the predictor variable (`attitude`). It’s hard to define what level of R^2^ is appropriate to claim the model fits well. Essentially, it will vary with the application and the domain studied. 
+
+A side note: In multiple regression settings, the R^2^ will always increase as more variables are included in the model. That’s why the adjusted R^2^ is the preferred measure as it adjusts for the number of variables considered.
+
+*F-statistic* is a good indicator of whether there is a relationship between predictor and the response variables. The further the F-statistic is from 1 the better it is. However, how much larger the F-statistic needs to be depends on both the number of data points and the number of predictors. Generally, when the number of data points is large, an F-statistic that is only a little bit larger than 1 is already sufficient to reject the null hypothesis (H0 : There is no relationship between speed and distance). The reverse is true as if the number of data points is small, a large F-statistic is required to be able to ascertain that there may be a relationship between predictor and response variables. In our example the F-statistic is 38.61 which is relatively larger than 1 given the size of our data, I think. But I know almost nothing about statistics.
+
+
+
+<!-- When there are more than one explanatory variables in the linear model, it is called multiple regression. -->
+<!-- Residuals vs Fitted (which = 1) --- to research the 'normality' od errors. Any pattern --- problem. -->
+<!-- QQ-plot (which = 2)  --- how well errors of the model fit the normality assumption. -->
+<!-- Residual vs Leverage plot (which = 5)  -- to identify which observations have an unusually high impact. -->
+
+
