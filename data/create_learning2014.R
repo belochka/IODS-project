@@ -45,7 +45,7 @@ analysis <- rename(analysis, age = Age, points = Points)
 setwd('./../')
 write.table(analysis, file = 'data/learning2014.txt', sep=",")
 readBack <- read.table(file = 'data/learning2014.txt', sep=",")
-all.equal(analysis, readBack)
+# all.equal(analysis, readBack)
 
 # Use `str()` and `head()` to make sure that the structure of the data is correct
 str(analysis)
