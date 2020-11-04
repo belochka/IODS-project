@@ -93,10 +93,13 @@ summary(lm(points ~ attitude + stra + surf, data = students2014))
 This summary shows that p-value < 0.05 only for attitude, what means that there is no statistically proved dependency between strategic approach and the point for the exam, or between surface approach and points. Therefore if to remove `stra` and `surf`:
 
 ```{r}
-summary(lm(points ~ attitude, data = students2014))
+suggestedModel <- lm(points ~ attitude, data = students2014)
+summary(suggestedModel)
 ```
 
 the dependecy becomes even stronger (because p-value became smaller).
+
+The formula of a line is $\alpha + \beta x$, the linear model has a formula $\alpha + \beta X + \varepsilon$, where $\alpha =$ intercept, $\beta$ --- coefficient before predictors (in our case --- only one --- `attitude`), and $\varepsilon$ --- an unobservable random variable, the error of the model.
 
 *Residuals* are essentially the difference between the actual observed response values (distance to stop dist in our case) and the response values that the model predicted. When assessing how well the model fit the data, you should look for a symmetrical distribution across these points on the mean value zero (0). If the distribution of the residuals do not appear to be strongly symmetrical that means that the model predicts certain points that fall far away from the actual observed points. 
 
@@ -115,11 +118,32 @@ A side note: In multiple regression settings, the R^2^ will always increase as m
 
 *F-statistic* is a good indicator of whether there is a relationship between predictor and the response variables. The further the F-statistic is from 1 the better it is. However, how much larger the F-statistic needs to be depends on both the number of data points and the number of predictors. Generally, when the number of data points is large, an F-statistic that is only a little bit larger than 1 is already sufficient to reject the null hypothesis (H0 : There is no relationship between speed and distance). The reverse is true as if the number of data points is small, a large F-statistic is required to be able to ascertain that there may be a relationship between predictor and response variables. In our example the F-statistic is 38.61 which is relatively larger than 1 given the size of our data, I think. But I know almost nothing about statistics.
 
+Ok, let's look at the errors using diagnostic plots:
+
+* Residuals vs Fitted values
+* Normal QQ-plot
+* Residuals vs Leverage
+
+to explore the validity of the model assumptions.
+
+```{r}
+par(mfrow = c(2,2))
+plot(suggestedModel, which = c(1, 2, 5))
+```
+
+As far as I understood, in the linear model it is assumed that an unobservable random variable $\varepsilon$ is assumed to have an approximately normal distribution with the mean value = 0 and a constant variance, they are not correlated. The constant variance assumption implies that the size of the error should not depend on the explanatory variables. This can be explored with a scatter plot of residuals versus model predictions (*"Residuals vs Fitted values"*, `which = 1`). Any pattern in the scatter plot implies a problem with the assumption. In our example, nothing stands out much. 
+
+*QQ-plot* (`which = 2`) of the residuals --- how well errors of the model fit the assumption of a normal distribution. When the point deviate from the line --- the residuals are deviating from the behavior of normal distribution. So mostly, out linear approximation is actually predicting the exam `points` correctly.
+
+*Leverage* measures how much impact a single observation has on model. *Residual vs Leverage* plot (`which = 5`)  -- to identify which observations have an unusually high impact. In this case --- no single high leverage, therefore "unjustifiably" affecting the coefficients of the linear model.
+
+Overall the actual data and the prediction together look like this:
 
 
-<!-- When there are more than one explanatory variables in the linear model, it is called multiple regression. -->
-<!-- Residuals vs Fitted (which = 1) --- to research the 'normality' od errors. Any pattern --- problem. -->
-<!-- QQ-plot (which = 2)  --- how well errors of the model fit the normality assumption. -->
-<!-- Residual vs Leverage plot (which = 5)  -- to identify which observations have an unusually high impact. -->
+```{r}
+qplot(attitude, points, data = students2014) + geom_smooth(method = "lm")
+```
 
+I'd say that based on the summary for the model and diagnostic plots, we have a linear model that almost perfectly explains the 19% of the data, and with the others the mistake is equal to the half of the value itself. Maybe an attitude is an important factor, but it's not the only one affecting the result at the exam.
 
+These factors might also be important --- free time to spend on self-education at this course, tenancy to overcome all the blocks on the way in understanding the task itself, passion for writing (and skills), and experience in programming. Probably, some others as well.
