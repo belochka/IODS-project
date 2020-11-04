@@ -46,3 +46,14 @@ table(students2014$gender)
 ```
 There were 110 female students and 56 male students that finished the course.
 
+Trying to grasp the data as a whole, let's plot it:
+
+```{r}
+library(GGally)
+library(ggplot2)
+p <- ggpairs(students2014, mapping = aes(col = gender, alpha = 0.3), lower = list(combo = wrap("facethist", bins = 20)))
+p
+```
+We know that there were more female students than male, therefore the pinkish  is for females, and blueish --- males.
+First column of horizontal histograms show how many females/males are of a certain age, have a certain attitute, and so forth.
+First row --- boxplots --- median, quartiles (median of lower and apper parts of the dataset), maximum, minimum and outliers. It shows that median global attitude toward statistics among females is lower than among males, males in general are less strategic then females in ther approach for studies, 
